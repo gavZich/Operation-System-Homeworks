@@ -1,0 +1,70 @@
+{
+  "part_1": [
+    {
+      "input": "pgns/Alburt.pgn",
+      "output_dir": "2",
+      "expected_output_directory": "splited_pgns/Alburt",
+      "expected_script_output": "tests/part_1_test/part_1_test_1_output.txt"
+    },
+    {
+      "input": "pgns/capmemel24.pgn",
+      "output_dir": "2",
+      "expected_output_directory": "splited_pgns/capmemel24",
+      "expected_script_output": "tests/part_1_test/part_1_test_1_output.txt"
+    }
+  ],
+  
+ "part_2": [
+    {
+      "input_path_pgn": "filtered_games/Alburt/Alburt_100.pgn",
+      "moves": "ssnddq"
+    },
+    {
+      "input_path_pgn": "filtered_games/Alburt/Alburt_196.pgn",
+      "moves": "dwdxmdwjoaq"
+    },
+    {
+      "input_path_pgn": "filtered_games/Alburt/Alburt_340.pgn",
+      "moves": "sodsaaaaq"
+    },
+    {
+      "input_path_pgn": "filtered_games/Alburt/Alburt_375.pgn",
+      "moves": "idwwkwyadaddawkdawwsawdwswsadusfawsq"
+    },
+    {
+      "input_path_pgn": "filtered_games/Alburt/Alburt_458.pgn",
+      "moves": "dwdwadaaddgwswkdlwddsaswsssasoslhadq"
+    },
+    {
+      "input_path_pgn": "filtered_games/Alburt/Alburt_563.pgn",
+      "moves": "ddamawshdzfawiwadawdsdwsddwaadwwscladaq"
+    }
+  ],
+
+  "part_2_special": [
+    {
+      "input_path_pgn": "splited_pgns/capmemel24/capmemel24_1.pgn",
+      "moves": "ssnddq"
+    },
+    {
+      "input_path_pgn": "splited_pgns/capmemel24/capmemel24_2.pgn",
+      "moves": "dwdxmdwjoaq"
+    },
+    {
+      "input_path_pgn": "splited_pgns/capmemel24/capmemel24_3.pgn",
+      "moves": "sodsaaaaq"
+    },
+    {
+      "input_path_pgn": "splited_pgns/capmemel24/capmemel24_4.pgn",
+      "moves": "idwwkwyadaddawkdawwsawdwswsadusfawsq"
+    },
+    {
+      "input_path_pgn": "splited_pgns/capmemel24/capmemel24_5.pgn",
+      "moves": "dwdwadaaddgwswkdlwddsaswsssasoslhadq"
+    },
+    {
+      "input_path_pgn": "splited_pgns/capmemel24/capmemel24_6.pgn",
+      "moves": "ddamawshdzfawiwadawdsdwsddwaadwwscladaq"
+    }
+  ]
+}
