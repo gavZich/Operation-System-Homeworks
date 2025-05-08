@@ -1,0 +1,20 @@
+[
+    {
+        "data": "1234567890abcdefghij",
+        "requests": "R 2 15\nR 0 2\nW 100 OMERTHEKING\nW 10 HEMI\nQ",
+        "data_changed": "1234567890HEMIabcdefghij",
+        "read_results": "34567890abcdef\n123"
+    },
+    {
+        "data": "1234567890abcdefghij",
+        "requests": "W 10 HelloWorld\nR 5 29\nW 100 InsertHere\nR 90 150\nW 110 XYZABC\nR 195 220\nW 20 LongTextHere\nQ",
+        "data_changed": "1234567890HelloWorldLongTextHereabcdefghij",
+        "read_results": "67890HelloWorldabcdefghij"
+    },
+    {
+        "data": "1234567890abcdefghij",
+        "requests": "R 2 2\nW 9 NEVERGONNAGIVEYOUUP\nR 0 25\nW 0 98\nW 10 WINDOWSISTRASH\nR 2 30\nQ",
+        "data_changed": "9812345678WINDOWSISTRASH9NEVERGONNAGIVEYOUUP0abcdefghij",
+        "read_results": "3\n123456789NEVERGONNAGIVEYOU\n12345678WINDOWSISTRASH9NEVERG"
+    }
+]
