@@ -9,13 +9,11 @@
 #define NUM_OF_VARIABLES 5
 /*
 * The order of the stats:
-* Health, Attack, Opponent1, Opponent2, Opponent3
+* Health[0], Attack[1], Opponent1[2], Opponent2[3], Opponent3[4]
 */
- // define a function that read how is the next opponent
-
-// Function that read health value from opponent's file
-int getHealthFromFile(const char* filename) {
-    FILE* f = fopen(filename, "r");
+// Function that read value of specific field 
+int getValueFromFileByIndex(const char* ownFile, int releventOffset) {
+      FILE* f = fopen(ownFile, "r");
     if (!f) {
         perror("Failed to open file for reading health");
         return -1;  // error value
@@ -30,16 +28,28 @@ int getHealthFromFile(const char* filename) {
 
     fclose(f);
 
-    // extract the first token (health value)
+    // Split the line into tokens
     char* token = strtok(line, ",");
-    if (!token) {
-        fprintf(stderr, "No health value found\n");
-        return -1;
+    int i = 0;
+    while (token) {
+        while (*token == ' ') token++;  // Trim leading spaces
+        if (i == releventOffset) {
+            return atoi(token);  // Convert the token to int and return
+        }
+        token = strtok(NULL, ",");
+        i++;
     }
 
-    while (*token == ' ') token++;  // remove leading spaces
-    return atoi(token);  // convert to int and return
+    // If the offset is out of range
+    fprintf(stderr, "Invalid offset: %d\n", releventOffset);
+    return -1;
 }
+
+// Builds the filename of an opponent given their number
+void getOpponentFilename(int opponentNumber, char* buffer, size_t bufferSize) {
+    snprintf(buffer, bufferSize, "g_%d.txt", opponentNumber);
+}
+
 
 // This function opens the opponent's file and reduces their health according to the attacker's power
 int attackAnOpponent(int attackerPower, const char* opponent) {
@@ -105,7 +115,78 @@ int attackAnOpponent(int attackerPower, const char* opponent) {
     return 1;
 }
 
+// Function that open a log file for every gladiator
+void createLogFile(int playerNumber) {
+    char filename[30];
+    snprintf(filename, sizeof(filename), "G%d_log.txt", playerNumber);
+
+    FILE* f = fopen(filename, "w");  // "w" = create new or overwrite existing
+    if (!f) {
+        perror("Failed to create log file");
+        return;
+    }
+
+    // Optionally write an initial line
+    fprintf(f, "Gladiator process started. 1234:\n");
+
+    fclose(f);  // Close the file to save changes
+}
+
+
+// Function that write the log actions in a file log
+void writeValueToFile(const char* gladiatorFile, const char* filename, int opponentNumber) {
+    // get the file name of the current opponent
+    char opponentFilename[30];
+    getOpponentFilename(opponentNumber, opponentFilename, sizeof(opponentFilename));
+    
+    // get the atttack power of the opponent
+    int opponentPower = getValueFromFileByIndex(opponentFilename, 1); // index 1 is power
+    
+    // reduce gladiator's health
+    attackAnOpponent(opponentPower, gladiatorFile);
+
+    // Get the updated health
+    int updatedHealth = getValueFromFileByIndex(gladiatorFile, 0); // index 0 is health
+
+    FILE* f = fopen(filename, "a");  // Open in append to add the lines under the existing content 
+    if (!f) {
+        perror("Failed to open file for writing");
+        return;
+    }
+
+    // write the action line
+    fprintf(f, "Facing opponent %d... Taking %d damage", opponentNumber, opponentPower);
+    // write the response line
+    if (updatedHealth > 0) {
+        fprintf(f, "Are you not entertained? Remaining health: %d\n", updatedHealth);
+    } else {
+        fprintf(f, "The gladiator has fallen... Final health: %d\n", updatedHealth);
+    }
+
+    fclose(f);  // Close the file (saves changes)
+}
+
+
 int main(int argc, char* argv[]) {
 
+    char Ownfilename[20];
+    getOpponentFilename(, Ownfilename, sizeof(Ownfilename));
+    
+    // initializ an array of opponents
+    int opponentArray[3];
+    for (int i = 0; i < 3; i++) {
+        int relevantIndex = 2 + i;
+        opponentArray[i] = getValueFromFileByIndex(Ownfilename, relevantIndex);
+    }
+
+    // extract the power attack
+    int attackPower = getValueFromFileByIndex(Ownfilename, 1);
+
+    for (int i = 0; i < 3; i++) {
+        char opponentfilename[20];
+        getOpponentFilename(opponentArray[i], opponentfilename, sizeof(opponentfilename));
+        attackAnOpponent(attackPower, opponentfilename);
+    }
+    
     return 0;
 }
