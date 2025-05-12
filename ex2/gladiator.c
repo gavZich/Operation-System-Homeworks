@@ -1,12 +1,23 @@
 # include <stdio.h>
 #include <stdlib.h>
-#include <strings.h>       
+#include <strings.h>      
+#include <string.h>       
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <sys/wait.h>
 
 #define MAX_SIZE 256
 #define NUM_OF_VARIABLES 5
+#define NUM_OPPONENTS 3
+
+// Declaration of function
+int getValueFromFileByIndex(const char* ownFile, int releventOffset);
+void getOpponentFilename(int opponentNumber, char* buffer, size_t bufferSize);
+int attackAnOpponent(int attackerPower, const char* opponent);
+void createLogFile(int playerNumber);
+void writeValueToFile(const char* gladiatorFile, const char* filename, int opponentNumber);
+
+
 /*
 * The order of the stats:
 * Health[0], Attack[1], Opponent1[2], Opponent2[3], Opponent3[4]
@@ -53,7 +64,7 @@ void getOpponentFilename(int opponentNumber, char* buffer, size_t bufferSize) {
 
 // This function opens the opponent's file and reduces their health according to the attacker's power
 int attackAnOpponent(int attackerPower, const char* opponent) {
-    int current_health = getHealthFromFile(opponent);  // Extract the current health from the file
+    int current_health = getValueFromFileByIndex(opponent, 0);  // Extract the current health from the file
     int new_health = current_health - attackerPower;   // Reduce the health by the attacker's power
 
     // Open the opponent's file in read mode
@@ -120,7 +131,7 @@ void createLogFile(int playerNumber) {
     char filename[30];
     snprintf(filename, sizeof(filename), "G%d_log.txt", playerNumber);
 
-    FILE* f = fopen(filename, "w");  // "w" = create new or overwrite existing
+    FILE* f = fopen(filename, "w");  // create new or overwrite existing
     if (!f) {
         perror("Failed to create log file");
         return;
@@ -167,26 +178,44 @@ void writeValueToFile(const char* gladiatorFile, const char* filename, int oppon
 }
 
 
+
 int main(int argc, char* argv[]) {
-
-    char Ownfilename[20];
-    getOpponentFilename(, Ownfilename, sizeof(Ownfilename));
-    
-    // initializ an array of opponents
-    int opponentArray[3];
-    for (int i = 0; i < 3; i++) {
-        int relevantIndex = 2 + i;
-        opponentArray[i] = getValueFromFileByIndex(Ownfilename, relevantIndex);
+    if (argc < 2) {
+        fprintf(stderr, "Usage: %s <gladiator_number>\n", argv[0]);
+        return 1;
     }
 
-    // extract the power attack
-    int attackPower = getValueFromFileByIndex(Ownfilename, 1);
+    // Extract own gladiator ID from argument
+    int gladiatorID = atoi(argv[1]);
 
-    for (int i = 0; i < 3; i++) {
-        char opponentfilename[20];
-        getOpponentFilename(opponentArray[i], opponentfilename, sizeof(opponentfilename));
-        attackAnOpponent(attackPower, opponentfilename);
+    // Build own filename and log filename
+    char ownFile[20];
+    char logFile[30];
+    getOpponentFilename(gladiatorID, ownFile, sizeof(ownFile));
+    snprintf(logFile, sizeof(logFile), "G%d_log.txt", gladiatorID);
+
+    // Create initial log file
+    createLogFile(gladiatorID);
+
+    // Extract attack power from own file (index 1)
+    int attackPower = getValueFromFileByIndex(ownFile, 1);
+
+    // Extract list of opponents (indices 2, 3, 4)
+    int opponents[NUM_OPPONENTS];
+    for (int i = 0; i < NUM_OPPONENTS; i++) {
+        opponents[i] = getValueFromFileByIndex(ownFile, 2 + i);
     }
-    
+
+    // Fight loop: keep going while health > 0
+    int currentHealth = getValueFromFileByIndex(ownFile, 0);
+
+    while (currentHealth > 0) {
+        for (int i = 0; i < NUM_OPPONENTS && currentHealth > 0; i++) {
+            int opponentID = opponents[i];
+            writeValueToFile(ownFile, logFile, opponentID);  // performs attack + logs it
+            currentHealth = getValueFromFileByIndex(ownFile, 0);  // check updated health
+        }
+    }
+
     return 0;
 }
