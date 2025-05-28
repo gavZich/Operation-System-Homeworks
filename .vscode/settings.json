@@ -3,6 +3,9 @@
         "stdlib.h": "c",
         "types.h": "c",
         "stdio.h": "c",
-        "stat.h": "c"
+        "stat.h": "c",
+        "wait.h": "c",
+        "string.h": "c",
+        "signal.h": "c"
     }
 }

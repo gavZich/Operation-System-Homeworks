@@ -1,0 +1,6 @@
+# gcc ex3.c -o ex3
+# ./ex3 Focus-Mode 2 3
+q
+1
+2
+3

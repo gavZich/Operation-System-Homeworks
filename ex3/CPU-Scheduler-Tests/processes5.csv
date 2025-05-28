@@ -1,0 +1,12 @@
+# gcc ex3.c -o ex3
+# ./ex3 CPU-Scheduler CPU-Scheduler-Tests/processes5.csv 5
+P1,Initial system setup,0,5,3
+P2,Handles user login,1,2,4
+P3,Background virus check,1,2,4
+P4,Establishes network settings,3,1,5
+P5,Checks for software updates,5,6,2
+P6,Indexes system files in background,5,2,3
+P7,Manages active user session,6,3,4
+P8,Delivers system alerts,6,1,2
+P9,Schedules data backup routines,20,5,1
+P10,Monitors battery and power state,10,2,3

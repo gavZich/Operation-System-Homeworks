@@ -1,0 +1,94 @@
+══════════════════════════════════════════════
+>> Scheduler Mode : FCFS
+>> Engine Status  : Initialized
+──────────────────────────────────────────────
+
+0 → 5: P1 Running Initial system setup.
+5 → 7: P2 Running Handles user login.
+7 → 9: P3 Running Background virus check.
+9 → 10: P4 Running Establishes network settings.
+10 → 16: P5 Running Checks for software updates.
+16 → 18: P6 Running Indexes system files in background.
+18 → 21: P7 Running Manages active user session.
+21 → 22: P8 Running Delivers system alerts.
+22 → 24: P10 Running Monitors battery and power state.
+24 → 29: P9 Running Schedules data backup routines.
+
+──────────────────────────────────────────────
+>> Engine Status  : Completed
+>> Summary        :
+   └─ Average Waiting Time : 7.50 time units
+>> End of Report
+══════════════════════════════════════════════
+
+══════════════════════════════════════════════
+>> Scheduler Mode : SJF
+>> Engine Status  : Initialized
+──────────────────────────────────────────────
+
+0 → 5: P1 Running Initial system setup.
+5 → 6: P4 Running Establishes network settings.
+6 → 7: P8 Running Delivers system alerts.
+7 → 9: P2 Running Handles user login.
+9 → 11: P3 Running Background virus check.
+11 → 13: P6 Running Indexes system files in background.
+13 → 15: P10 Running Monitors battery and power state.
+15 → 18: P7 Running Manages active user session.
+18 → 24: P5 Running Checks for software updates.
+24 → 29: P9 Running Schedules data backup routines.
+
+──────────────────────────────────────────────
+>> Engine Status  : Completed
+>> Summary        :
+   └─ Average Waiting Time : 5.10 time units
+>> End of Report
+══════════════════════════════════════════════
+
+══════════════════════════════════════════════
+>> Scheduler Mode : Priority
+>> Engine Status  : Initialized
+──────────────────────────────────────────────
+
+0 → 5: P1 Running Initial system setup.
+5 → 11: P5 Running Checks for software updates.
+11 → 12: P8 Running Delivers system alerts.
+12 → 14: P6 Running Indexes system files in background.
+14 → 16: P10 Running Monitors battery and power state.
+16 → 18: P2 Running Handles user login.
+18 → 20: P3 Running Background virus check.
+20 → 25: P9 Running Schedules data backup routines.
+25 → 28: P7 Running Manages active user session.
+28 → 29: P4 Running Establishes network settings.
+
+──────────────────────────────────────────────
+>> Engine Status  : Completed
+>> Summary        :
+   └─ Average Waiting Time : 9.20 time units
+>> End of Report
+══════════════════════════════════════════════
+
+══════════════════════════════════════════════
+>> Scheduler Mode : Round Robin
+>> Engine Status  : Initialized
+──────────────────────────────────────────────
+
+0 → 5: P1 Running Initial system setup.
+5 → 7: P2 Running Handles user login.
+7 → 9: P3 Running Background virus check.
+9 → 10: P4 Running Establishes network settings.
+10 → 15: P5 Running Checks for software updates.
+15 → 17: P6 Running Indexes system files in background.
+17 → 20: P7 Running Manages active user session.
+20 → 21: P8 Running Delivers system alerts.
+21 → 23: P10 Running Monitors battery and power state.
+23 → 28: P9 Running Schedules data backup routines.
+28 → 29: P5 Running Checks for software updates.
+
+──────────────────────────────────────────────
+>> Engine Status  : Completed
+>> Summary        :
+   └─ Total Turnaround Time : 29 time units
+
+>> End of Report
+══════════════════════════════════════════════
+

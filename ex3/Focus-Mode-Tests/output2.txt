@@ -1,0 +1,52 @@
+Entering Focus Mode. All distractions are blocked.
+══════════════════════════════════════════════
+                Focus Round 1                
+──────────────────────────────────────────────
+
+Simulate a distraction:
+  1 = Email notification
+  2 = Reminder to pick up delivery
+  3 = Doorbell Ringing
+  q = Quit
+>> ──────────────────────────────────────────────
+        Checking pending distractions...      
+──────────────────────────────────────────────
+No distractions reached you this round.
+──────────────────────────────────────────────
+             Back to Focus Mode.              
+══════════════════════════════════════════════
+══════════════════════════════════════════════
+                Focus Round 2                
+──────────────────────────────────────────────
+
+Simulate a distraction:
+  1 = Email notification
+  2 = Reminder to pick up delivery
+  3 = Doorbell Ringing
+  q = Quit
+>> 
+Simulate a distraction:
+  1 = Email notification
+  2 = Reminder to pick up delivery
+  3 = Doorbell Ringing
+  q = Quit
+>> 
+Simulate a distraction:
+  1 = Email notification
+  2 = Reminder to pick up delivery
+  3 = Doorbell Ringing
+  q = Quit
+>> ──────────────────────────────────────────────
+        Checking pending distractions...      
+──────────────────────────────────────────────
+ - Email notification is waiting.
+[Outcome:] The TA announced: Everyone get 100 on the exercise!
+ - You have a reminder to pick up your delivery.
+[Outcome:] You picked it up just in time.
+ - The doorbell is ringing.
+[Outcome:] Food delivery is here.
+──────────────────────────────────────────────
+             Back to Focus Mode.              
+══════════════════════════════════════════════
+
+Focus Mode complete. All distractions are now unblocked.

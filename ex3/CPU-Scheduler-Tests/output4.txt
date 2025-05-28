@@ -1,0 +1,81 @@
+══════════════════════════════════════════════
+>> Scheduler Mode : FCFS
+>> Engine Status  : Initialized
+──────────────────────────────────────────────
+
+0 → 7: P1 Running Audio Engine Service.
+7 → 11: P2 Running Scheduled Task Runner.
+11 → 12: P3 Running Disk Cleanup Utility.
+12 → 16: P4 Running Clipboard Monitoring Service.
+
+──────────────────────────────────────────────
+>> Engine Status  : Completed
+>> Summary        :
+   └─ Average Waiting Time : 4.75 time units
+>> End of Report
+══════════════════════════════════════════════
+
+══════════════════════════════════════════════
+>> Scheduler Mode : SJF
+>> Engine Status  : Initialized
+──────────────────────────────────────────────
+
+0 → 7: P1 Running Audio Engine Service.
+7 → 8: P3 Running Disk Cleanup Utility.
+8 → 12: P2 Running Scheduled Task Runner.
+12 → 16: P4 Running Clipboard Monitoring Service.
+
+──────────────────────────────────────────────
+>> Engine Status  : Completed
+>> Summary        :
+   └─ Average Waiting Time : 4.00 time units
+>> End of Report
+══════════════════════════════════════════════
+
+══════════════════════════════════════════════
+>> Scheduler Mode : Priority
+>> Engine Status  : Initialized
+──────────────────────────────────────────────
+
+0 → 7: P1 Running Audio Engine Service.
+7 → 11: P2 Running Scheduled Task Runner.
+11 → 12: P3 Running Disk Cleanup Utility.
+12 → 16: P4 Running Clipboard Monitoring Service.
+
+──────────────────────────────────────────────
+>> Engine Status  : Completed
+>> Summary        :
+   └─ Average Waiting Time : 4.75 time units
+>> End of Report
+══════════════════════════════════════════════
+
+══════════════════════════════════════════════
+>> Scheduler Mode : Round Robin
+>> Engine Status  : Initialized
+──────────────────────────────────────────────
+
+0 → 1: P1 Running Audio Engine Service.
+1 → 2: P1 Running Audio Engine Service.
+2 → 3: P2 Running Scheduled Task Runner.
+3 → 4: P1 Running Audio Engine Service.
+4 → 5: P2 Running Scheduled Task Runner.
+5 → 6: P3 Running Disk Cleanup Utility.
+6 → 7: P4 Running Clipboard Monitoring Service.
+7 → 8: P1 Running Audio Engine Service.
+8 → 9: P2 Running Scheduled Task Runner.
+9 → 10: P4 Running Clipboard Monitoring Service.
+10 → 11: P1 Running Audio Engine Service.
+11 → 12: P2 Running Scheduled Task Runner.
+12 → 13: P4 Running Clipboard Monitoring Service.
+13 → 14: P1 Running Audio Engine Service.
+14 → 15: P4 Running Clipboard Monitoring Service.
+15 → 16: P1 Running Audio Engine Service.
+
+──────────────────────────────────────────────
+>> Engine Status  : Completed
+>> Summary        :
+   └─ Total Turnaround Time : 16 time units
+
+>> End of Report
+══════════════════════════════════════════════
+

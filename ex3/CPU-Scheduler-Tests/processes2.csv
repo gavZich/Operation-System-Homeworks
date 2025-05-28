@@ -1,0 +1,7 @@
+# gcc ex3.c -o ex3
+# ./ex3 CPU-Scheduler CPU-Scheduler-Tests/processes2.csv 20
+P1,User Login Service,0,10,3
+P2,Graphical Session Initialization,0,1,1
+P3,Power Management Service,0,2,4
+P4,System Update Daemon,0,1,5
+P5,Filesystem Mount Manager,0,5,2

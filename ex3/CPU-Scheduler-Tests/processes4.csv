@@ -1,0 +1,6 @@
+# gcc ex3.c -o ex3
+# ./ex3 CPU-Scheduler CPU-Scheduler-Tests/processes4.csv 1
+P1,Audio Engine Service,0,7,30
+P2,Scheduled Task Runner,2,4,10
+P3,Disk Cleanup Utility,4,1,20
+P4,Clipboard Monitoring Service,5,4,40

@@ -1,0 +1,20 @@
+Entering Focus Mode. All distractions are blocked.
+══════════════════════════════════════════════
+                Focus Round 1                
+──────────────────────────────────────────────
+
+Simulate a distraction:
+  1 = Email notification
+  2 = Reminder to pick up delivery
+  3 = Doorbell Ringing
+  q = Quit
+>> ──────────────────────────────────────────────
+        Checking pending distractions...      
+──────────────────────────────────────────────
+ - Email notification is waiting.
+[Outcome:] The TA announced: Everyone get 100 on the exercise!
+──────────────────────────────────────────────
+             Back to Focus Mode.              
+══════════════════════════════════════════════
+
+Focus Mode complete. All distractions are now unblocked.

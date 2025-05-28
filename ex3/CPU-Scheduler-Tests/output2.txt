@@ -1,0 +1,73 @@
+══════════════════════════════════════════════
+>> Scheduler Mode : FCFS
+>> Engine Status  : Initialized
+──────────────────────────────────────────────
+
+0 → 10: P1 Running User Login Service.
+10 → 11: P2 Running Graphical Session Initialization.
+11 → 13: P3 Running Power Management Service.
+13 → 14: P4 Running System Update Daemon.
+14 → 19: P5 Running Filesystem Mount Manager.
+
+──────────────────────────────────────────────
+>> Engine Status  : Completed
+>> Summary        :
+   └─ Average Waiting Time : 9.60 time units
+>> End of Report
+══════════════════════════════════════════════
+
+══════════════════════════════════════════════
+>> Scheduler Mode : SJF
+>> Engine Status  : Initialized
+──────────────────────────────────────────────
+
+0 → 1: P2 Running Graphical Session Initialization.
+1 → 2: P4 Running System Update Daemon.
+2 → 4: P3 Running Power Management Service.
+4 → 9: P5 Running Filesystem Mount Manager.
+9 → 19: P1 Running User Login Service.
+
+──────────────────────────────────────────────
+>> Engine Status  : Completed
+>> Summary        :
+   └─ Average Waiting Time : 3.20 time units
+>> End of Report
+══════════════════════════════════════════════
+
+══════════════════════════════════════════════
+>> Scheduler Mode : Priority
+>> Engine Status  : Initialized
+──────────────────────────────────────────────
+
+0 → 1: P2 Running Graphical Session Initialization.
+1 → 6: P5 Running Filesystem Mount Manager.
+6 → 16: P1 Running User Login Service.
+16 → 18: P3 Running Power Management Service.
+18 → 19: P4 Running System Update Daemon.
+
+──────────────────────────────────────────────
+>> Engine Status  : Completed
+>> Summary        :
+   └─ Average Waiting Time : 8.20 time units
+>> End of Report
+══════════════════════════════════════════════
+
+══════════════════════════════════════════════
+>> Scheduler Mode : Round Robin
+>> Engine Status  : Initialized
+──────────────────────────────────────────────
+
+0 → 10: P1 Running User Login Service.
+10 → 11: P2 Running Graphical Session Initialization.
+11 → 13: P3 Running Power Management Service.
+13 → 14: P4 Running System Update Daemon.
+14 → 19: P5 Running Filesystem Mount Manager.
+
+──────────────────────────────────────────────
+>> Engine Status  : Completed
+>> Summary        :
+   └─ Total Turnaround Time : 19 time units
+
+>> End of Report
+══════════════════════════════════════════════
+

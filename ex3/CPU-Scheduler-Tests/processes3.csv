@@ -1,0 +1,6 @@
+# gcc ex3.c -o ex3
+# ./ex3 CPU-Scheduler CPU-Scheduler-Tests/processes3.csv 3
+P3,System Bootloader,3,3,3
+P2,Kernel Initialization,2,2,2
+P1,Device Driver Loading,1,1,1
+P4,Network Services Startup,10,10,10
