@@ -39,6 +39,8 @@ typedef struct process {
     int isFinished;       // Flag: 1 if process has already exited
     int remainingTime;
     int originalIndex;
+    int rrQuantum;  
+
 } Process;
 
 Process processes[MAX_PROCESSES];
@@ -108,8 +110,7 @@ void handle_sigcont(int signum) {
         alarm(process->remainingTime);
     }
     // puse untill SIGALRM arrive
-    pause();
-    
+    pause(); 
 }
 
 // SIGALRM handler in the child process:
@@ -178,8 +179,58 @@ int cmp_process(const void *a, const void *b) {
     return pa->originalIndex - pb->originalIndex;
 }
 
-// sortMode = SORT_BY_BURST;
-// qsort(processes, processCount, sizeof *processes, cmp_process);
+
+// SIGCONT handler for RR.
+// Runs for min(remainingTime, RR_QUANTUM), then returns to pause().
+void handle_sigcont_rr(int signum) {
+    Process *pr = find_process_by_pid(getpid());
+    if (!pr) _exit(1);
+    int slice = pr->remainingTime < pr->rrQuantum
+                ? pr->remainingTime
+                : pr->rrQuantum;
+    alarm(slice);
+    pause();
+}
+
+
+
+// SIGALRM handler for RR.
+// If more time remains, subtract the slice and self‐stop (preempt).
+// Otherwise, exit (job complete).
+void handle_sigalrm_rr(int signum) {
+    Process *pr = find_process_by_pid(getpid());
+    if (!pr) _exit(1);
+    if (pr->remainingTime > pr->rrQuantum) {
+        pr->remainingTime -= pr->rrQuantum;
+        raise(SIGSTOP);
+    } else {
+        _exit(0);
+    }
+}
+
+// Child entry point for RR.
+// Installs the RR‐specific signal handlers and stops itself until scheduler SIGCONT.
+void child_main_rr(Process *process) {
+    // initialize remainingTime if not already set
+    process->remainingTime = process->burstTime;
+
+    // install SIGCONT handler
+    struct sigaction sa_cont = { .sa_handler = handle_sigcont_rr };
+    sigemptyset(&sa_cont.sa_mask);
+    sigaction(SIGCONT, &sa_cont, NULL);
+
+    // install SIGALRM handler
+    struct sigaction sa_alrm = { .sa_handler = handle_sigalrm_rr };
+    sigemptyset(&sa_alrm.sa_mask);
+    sigaction(SIGALRM, &sa_alrm, NULL);
+
+    // stop immediately until first SIGCONT
+    raise(SIGSTOP);
+
+    // never returns: handle_sigcont_rr → alarm → pause → handle_sigalrm_rr
+    for (;;)
+        pause();
+}
 
 // function that clculate an avrage
 int avrage(int totalWatingTime, int n) {
@@ -213,22 +264,15 @@ void run_fcfs(Process *processes, int processCount) {
 
         // record start
         int start = currentTime;
-
         // resume child; child_main will alarm+pause for burstTime
         kill(p->pid, SIGCONT);
-
         // wait here until the child's SIGALRM handler exits the child
         waitpid(p->pid, NULL, 0);
-
         // advance our clock by burstTime
         currentTime += p->burstTime;
 
         // print after real-time burst completed
-        printf("%d → %d: %s Running %s.\n",
-               start,
-               currentTime,
-               p->name,
-               p->description);
+        printf("%d → %d: %s Running %s.\n", start, currentTime, p->name, p->description);
 
         // accumulate waiting time = start − arrival
         totalWaitingTime += (start - p->arrivalTime);
@@ -244,40 +288,270 @@ void run_fcfs(Process *processes, int processCount) {
     printf("══════════════════════════════════════════════\n");
 }
 
+// SJF algorithem
+void run_sjf(Process *processes, int processCount) {
+    // Header
+    printf("══════════════════════════════════════════════\n");
+    printf(">> Scheduler Mode : SJF\n");
+    printf(">> Engine Status  : Initialized\n");
+    printf("──────────────────────────────────────────────\n\n");
+
+    // Sort the by arrival time to insert the process by their order
+    sortMode = SORT_BY_ARRIVAL;
+    qsort(processes, processCount, sizeof(Process), cmp_process);
+
+    int currentTime = 0; // display the current time
+    int totalWaitingTime = 0; // counte the wating time of all the processes
+    int nextIndex = 0; // manage the 
+
+    // readyQueue holds arrived but not yet run copies
+    Process readyQueue[MAX_PROCESSES];
+    int readyCount = 0; // pointer for the queue
+
+    // Loop until we've dispatched all
+    while (nextIndex < processCount || readyCount > 0) {
+        // Enqueue all newly arrived every iteration
+        while (nextIndex < processCount &&
+               processes[nextIndex].arrivalTime <= currentTime)
+        {
+            readyQueue[readyCount++] = processes[nextIndex++];
+        }
+
+        // f nothing ready so print idle
+        if (readyCount == 0) {
+            // hold the arrivel time of the next process 
+            int nextArrival = processes[nextIndex].arrivalTime;
+            printf("%d → %d: Idle.\n", currentTime, nextArrival);
+            sleep(nextArrival - currentTime);
+            currentTime = nextArrival;
+            continue;
+        }
+
+        // Pick shortest job sort readyQueue by burstTime
+        sortMode = SORT_BY_BURST;
+        qsort(readyQueue, readyCount, sizeof(Process), cmp_process);
+
+        // Pop first process
+        Process p = readyQueue[0];
+        memmove(&readyQueue[0], &readyQueue[1], (--readyCount) * sizeof(Process));
+
+        // record start
+        int start = currentTime;
+        // resume child; child_main will alarm+pause for burstTime
+        kill(p.pid, SIGCONT);
+        // wait here until the child's SIGALRM handler exits the child
+        waitpid(p.pid, NULL, 0);
+        // advance our clock by burstTime
+        currentTime += p.burstTime;
+
+        // Print after it actually ran
+        printf("%d → %d: %s Running %s.\n", start, currentTime, p.name, p.description);
+
+        // Accumulate waiting time
+        totalWaitingTime += (start - p.arrivalTime);
+    }
+
+    // Footer & summary
+    printf("\n──────────────────────────────────────────────\n");
+    printf(">> Engine Status  : Completed\n");
+    printf(">> Summary        :\n");
+    double avg = (double)totalWaitingTime / processCount;
+    printf("   └─ Average Waiting Time : %.2f time units\n", avg);
+    printf(">> End of Report\n");
+    printf("══════════════════════════════════════════════\n");
+}
+
+
+// PRIORITY algorithem
+void run_priority(Process *processes, int processCount) {
+    // Header
+    printf("══════════════════════════════════════════════\n");
+    printf(">> Scheduler Mode : Priority\n");
+    printf(">> Engine Status  : Initialized\n");
+    printf("──────────────────────────────────────────────\n\n");
+
+    // Sort the by arrival time to insert the process by their order
+    sortMode = SORT_BY_ARRIVAL;
+    qsort(processes, processCount, sizeof(Process), cmp_process);
+
+    int currentTime = 0; // display the current time
+    int totalWaitingTime = 0; // counte the wating time of all the processes
+    int nextIndex = 0; // manage the 
+
+    // readyQueue holds arrived but not yet run copies
+    Process readyQueue[MAX_PROCESSES];
+    int readyCount = 0; // pointer for the queue
+
+    // Loop until we've dispatched all
+    while (nextIndex < processCount || readyCount > 0) {
+        // Enqueue all newly arrived every iteration
+        while (nextIndex < processCount &&
+               processes[nextIndex].arrivalTime <= currentTime)
+        {
+            readyQueue[readyCount++] = processes[nextIndex++];
+        }
+
+        // if nothing is ready so print idle
+        if (readyCount == 0) {
+            // hold the arrivel time of the next process 
+            int nextArrival = processes[nextIndex].arrivalTime;
+            printf("%d → %d: Idle.\n", currentTime, nextArrival);
+            sleep(nextArrival - currentTime);
+            currentTime = nextArrival;
+            continue;
+        }
+
+        // Pick shortest job sort readyQueue by burstTime
+        sortMode = SORT_BY_PRIORITY;
+        qsort(readyQueue, readyCount, sizeof(Process), cmp_process);
+
+        // Pop first process
+        Process p = readyQueue[0];
+        memmove(&readyQueue[0], &readyQueue[1], (--readyCount) * sizeof(Process));
+
+        // record start
+        int start = currentTime;
+        // resume child; child_main will alarm+pause for burstTime
+        kill(p.pid, SIGCONT);
+        // wait here until the child's SIGALRM handler exits the child
+        waitpid(p.pid, NULL, 0);
+        // advance our clock by burstTime
+        currentTime += p.burstTime;
+
+        // Print after it actually ran
+        printf("%d → %d: %s Running %s.\n", start, currentTime, p.name, p.description);
+
+        // Accumulate waiting time
+        totalWaitingTime += (start - p.arrivalTime);
+    }
+
+    // Footer & summary
+    printf("\n──────────────────────────────────────────────\n");
+    printf(">> Engine Status  : Completed\n");
+    printf(">> Summary        :\n");
+    double avg = (double)totalWaitingTime / processCount;
+    printf("   └─ Average Waiting Time : %.2f time units\n", avg);
+    printf(">> End of Report\n");
+    printf("══════════════════════════════════════════════\n");
+}
+
+// RR algorithem
+void run_rr(Process *processes, int processCount, int timeQuantum) {
+    // Header
+    printf("══════════════════════════════════════════════\n");
+    printf(">> Scheduler Mode : Round Robin\n");
+    printf(">> Engine Status  : Initialized\n");
+    printf("──────────────────────────────────────────────\n\n");
+
+    // Sort by arrival to enqueue in order
+    sortMode = SORT_BY_ARRIVAL;
+    qsort(processes, processCount, sizeof(Process), cmp_process);
+
+    int currentTime = 0;
+    int nextIndex   = 0;
+
+    Process readyQueue[MAX_PROCESSES];
+    int     readyCount = 0;
+
+    // Dispatch loop
+    while (nextIndex < processCount || readyCount > 0) {
+        // Enqueue all arrivals up to currentTime
+        while (nextIndex < processCount &&
+               processes[nextIndex].arrivalTime <= currentTime)
+        {
+            readyQueue[readyCount++] = processes[nextIndex++];
+        }
+
+        // If nothing ready → Idle
+        if (readyCount == 0) {
+            int nextArrival = processes[nextIndex].arrivalTime;
+            printf("%d → %d: Idle.\n", currentTime, nextArrival);
+            sleep(nextArrival - currentTime);
+            currentTime = nextArrival;
+            continue;
+        }
+
+        // Pop the front of readyQueue (FCFS order for RR)
+        Process p = readyQueue[0];
+        memmove(&readyQueue[0], &readyQueue[1],
+                (--readyCount) * sizeof(Process));
+
+        // Compute this slice length
+        int slice = p.remainingTime < timeQuantum ? p.remainingTime : timeQuantum;
+
+        // Run it in real time
+        int status, start = currentTime;
+        kill(p.pid, SIGCONT);                     // child_main_rr will alarm+pause
+        waitpid(p.pid, &status, WUNTRACED);        // catch STOP or EXIT
+        currentTime += slice;
+
+        // Print after it really ran
+        printf("%d → %d: %s Running %s.\n",
+               start, currentTime,
+               p.name, p.description);
+
+        // If preempted, update remainingTime & requeue
+        if (WIFSTOPPED(status)) {
+            p.remainingTime -= slice;
+            readyQueue[readyCount++] = p;
+        }
+        // if it exited, we’re done with this process
+    }
+
+    // Footer & summary
+    printf("\n──────────────────────────────────────────────\n");
+    printf(">> Engine Status  : Completed\n");
+    printf(">> Summary        :\n");
+    printf("   └─ Total Turnaround Time : %d time units\n", currentTime);
+    printf(">> End of Report\n");
+    printf("══════════════════════════════════════════════\n");
+}
+
+
+
 void runCPUScheduler(char* processesCsvFilePath, int timeQuantum) {
     // Parse CSV into processes[]
     parseProcessesFromFile(processesCsvFilePath);
 
-    // For each scheduling algorithm:
     for (int alg = 0; alg < 4; alg++) {
-        // Reset per-process fields:
+        // 1) Reset per‐process fields
         for (int i = 0; i < processCount; i++) {
             processes[i].remainingTime = processes[i].burstTime;
-            processes[i].isFinished = 0;
-            processes[i].waitingTime = 0;
-            processes[i].started = 0;
+            processes[i].isFinished     = 0;
+            processes[i].waitingTime    = 0;
+            processes[i].started        = 0;
+            processes[i].rrQuantum    = timeQuantum;
         }
 
-        // Fork one child per process and immediately SIGSTOP them:
+        // 2) Fork each child and STOP it immediately
         for (int i = 0; i < processCount; i++) {
             pid_t pid = fork();
-            if (pid == 0) {
-                child_main(&processes[i]);
-                _exit(0);
-            } else {
-                processes[i].pid = pid;
-                kill(pid, SIGSTOP);
+            if (pid < 0) {
+                perror("fork failed");
+                exit(EXIT_FAILURE);
             }
+            if (pid == 0) {
+                // Child: install the right handlers and stop
+                if (alg == 3) {
+                    // Round‐Robin
+                    child_main_rr(&processes[i]);   // uses handle_sigcont_rr / handle_sigalrm_rr
+                } else {
+                    // FCFS, SJF or Priority
+                    child_main(&processes[i]);      // uses handle_sigcont / handle_sigalrm
+                }
+                _exit(0);
+            } 
+            // Parent
+            processes[i].pid = pid;
+            kill(pid, SIGSTOP);
         }
 
-        // c) Call the right scheduler function:
+        // 3) Dispatch according to the current algorithm
         switch (alg) {
-            case 0: run_fcfs(processes, processCount); break;
-            case 1: run_sjf(processes, processCount); break;
-            case 2: run_priority(processes, processCount); break;
+            case 0: run_fcfs(processes, processCount);      break;
+            case 1: run_sjf(processes, processCount);       break;
+            case 2: run_priority(processes, processCount);  break;
             case 3: run_rr(processes, processCount, timeQuantum); break;
         }
-
-        // Now all children have exited. Loop to the next algorithm.
     }
 }
