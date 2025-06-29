@@ -13,6 +13,7 @@
 #define MAX_NAME 50
 #define MAX_DESCRIPTION 100
 
+// Proccess struct, contain all the fields for the algorithems
 typedef struct {
     pid_t pid;
     char name[MAX_NAME];
@@ -23,8 +24,8 @@ typedef struct {
     int remainingTime;
 } Process;
 
-/* ──────────────────────────────── Utility Functions ──────────────────────────────── */
 
+// Parse and init the data from the file into the structs
 int loadProcessesFromCSV(const char *filePath, Process procList[]) {
     FILE *fp = fopen(filePath, "r");
     if (!fp) {
@@ -64,6 +65,7 @@ int loadProcessesFromCSV(const char *filePath, Process procList[]) {
     return count;
 }
 
+// Printer functions
 void printReportHeader(const char *mode) {
     printf("══════════════════════════════════════════════\n");
     printf(">> Scheduler Mode : %s\n", mode);
@@ -71,6 +73,7 @@ void printReportHeader(const char *mode) {
     printf("──────────────────────────────────────────────\n\n");
 }
 
+// Printer functions
 void printReportFooter(const char *label, float value, int isInt) {
     printf("\n");
     printf("──────────────────────────────────────────────\n");
@@ -84,11 +87,12 @@ void printReportFooter(const char *label, float value, int isInt) {
     printf("══════════════════════════════════════════════\n\n");
 }
 
-
+// handle IDLE time
 void simulateIdleTime(int start, int end) {
     printf("%d → %d: Idle.\n", start, end);
 }
 
+// simple implement of bubblesort
 void sortByArrival(Process p[], int n) {
     for (int i = 0; i < n-1; ++i)
         for (int j = 0; j < n-i-1; ++j)
@@ -100,11 +104,11 @@ void sortByArrival(Process p[], int n) {
 }
 
 void alarmHandler(int sig) {
-    // Dummy handler for SIGALRM
+    // handler for SIGALRM
 }
 
-/* ──────────────────────────────── Execution Simulation ──────────────────────────────── */
 
+// execute process and invoke it
 void spawnChildProcess(Process *p, int *now, int *waitSum) {
     pid_t pid = fork();
     if (pid == 0) {
@@ -127,6 +131,7 @@ void spawnChildProcess(Process *p, int *now, int *waitSum) {
     }
 }
 
+// manege the same goals but for RR algorithem
 void spawnChildProcessRR(Process *p, int *now, int *waitSum, int duration) {
     pid_t pid = fork();
     if (pid == 0) {
@@ -152,8 +157,8 @@ void spawnChildProcessRR(Process *p, int *now, int *waitSum, int duration) {
     }
 }
 
-/* ──────────────────────────────── Scheduling Algorithms ──────────────────────────────── */
 
+// FCFS Algorithem
 void runFCFS(Process p[], int count) {
     sortByArrival(p, count);
     printReportHeader("FCFS");
@@ -170,6 +175,7 @@ void runFCFS(Process p[], int count) {
     printReportFooter("Average Waiting Time", (float)waitSum / count, 0);
 }
 
+// SJF Algorithem
 void runSJF(Process p[], int count) {
     printReportHeader("SJF");
 
@@ -206,6 +212,7 @@ void runSJF(Process p[], int count) {
     printReportFooter("Average Waiting Time", (float)waitSum / count, 0);
 }
 
+// Priority Algorithem
 void runPriority(Process p[], int count) {
     printReportHeader("Priority");
 
@@ -242,6 +249,7 @@ void runPriority(Process p[], int count) {
     printReportFooter("Average Waiting Time", (float)waitSum / count, 0);
 }
 
+// RR Algorithem
 void runRR(Process p[], int count, int quantum) {
     printReportHeader("Round Robin");
 
@@ -297,7 +305,6 @@ void runRR(Process p[], int count, int quantum) {
     printReportFooter("Total Turnaround Time", time, 1);
 }
 
-/* ──────────────────────────────── Main Controller ──────────────────────────────── */
 
 void runCPUScheduler(char *filePath, int quantum) {
     Process procList[MAX_PROCESSES];
